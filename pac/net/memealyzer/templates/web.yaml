@@ -1,0 +1,60 @@
+kind: ConfigMap
+metadata:
+  name: memealyzer-web-config
+apiVersion: v1
+data:
+  appsettings.json: |-
+    {
+      "API_ENDPOINT": "{{ (index (lookup "v1" "Service" "default" "memealyzer-api").status.loadBalancer.ingress 0).ip }}",
+      "FUNCTIONS_ENDPOINT": "{{ .Values.endpoints.functions }}"
+    }
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: memealyzer-web
+  name: 
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: memealyzer-web
+  template:
+    metadata:
+      labels:
+        app: memealyzer-web
+    spec:
+      containers:
+      - name: memealyzer-web
+        image: {{ .Values.registry }}/{{ .Values.webImage }}
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 80
+        - containerPort: 443
+        volumeMounts:
+        - name: config
+          mountPath: /var/www/web/appsettings.json
+          readOnly: true
+          subPath: appsettings.json
+      volumes:
+      - name: config
+        configMap:
+          name: memealyzer-web-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: memealyzer-web
+  name: memealyzer-web
+spec:
+  selector:
+    app: memealyzer-web
+  ports:
+  - name: http
+    port: 80
+    targetPort: 80
+  - name: https
+    port: 443
+    targetPort: 443

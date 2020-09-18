@@ -1,0 +1,52 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: memealyzer-queueService-config
+data:
+  AZURE_COSMOS_COLLECTION: images
+  AZURE_COSMOS_DB: memealyzer
+  AZURE_COSMOS_ENDPOINT: {{ .Values.endpoints.cosmos }}
+  AZURE_COSMOS_KEY_SECRET_NAME: CosmosKey
+  AZURE_FORM_RECOGNIZER_ENDPOINT: {{ .Values.endpoints.formRecognizer }}
+  AZURE_KEYVAULT_ENDPOINT: {{ .Values.endpoints.keyVault }}
+  AZURE_STORAGE_BLOB_CONTAINER_NAME: blobs
+  AZURE_STORAGE_BLOB_ENDPOINT: {{ .Values.endpoints.blob }}
+  AZURE_STORAGE_QUEUE_ENDPOINT: {{ .Values.endpoints.queue }}
+  AZURE_STORAGE_QUEUE_MSG_COUNT: "10"
+  AZURE_STORAGE_QUEUE_NAME: messages
+  AZURE_STORAGE_QUEUE_RECEIVE_SLEEP: "1"
+  AZURE_TEXT_ANALYTICS_ENDPOINT: {{ .Values.endpoints.textAnalytics }}
+  MEME_ENDPOINT: https://meme-api.herokuapp.com/gimme/wholesomememes
+  AZURE_STORAGE_TYPE: {{ .Values.storage.type }}
+  AZURE_STORAGE_KEY_SECRET_NAME: StorageKey
+  AZURE_STORAGE_TABLE_NAME: images
+  AZURE_STORAGE_TABLE_ENDPOINT: {{ .Values.endpoints.table }}
+  AZURE_STORAGE_ACCOUNT_NAME: {{ .Values.storage.storageAccount }}
+  AZURE_APP_CONFIG_ENDPOINT: {{ .Values.endpoints.appConfig }}
+  AZURE_STORAGE_CLIENT_SYNC_QUEUE_NAME: sync
+  AZURE_SIGNALR_CONNECTION_STRING_SECRET_NAME: SignalRConnectionString
+  AZURE_STORAGE_CONNECTION_STRING_SECRET_NAME: StorageConnectionString
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: memealyzer-queueService
+  name: memealyzer-queueService
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: memealyzer-queueService
+  template:
+    metadata:
+      labels:
+        app: memealyzer-queueService
+    spec:
+      containers:
+      - name: memealyzernetqueueservice
+        image: {{ .Values.registry }}/{{ .Values.queueServiceImage }}
+        imagePullPolicy: "Always"
+        envFrom:
+        - configMapRef:
+            name: memealyzer-queueService-config

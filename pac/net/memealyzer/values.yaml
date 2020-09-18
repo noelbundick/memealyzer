@@ -1,0 +1,19 @@
+endpoints:
+  cosmos: https://memealyzerdevcosmosaccount.documents.azure.com:443/
+  formRecognizer: https://memealyzerdevformrecognizer.cognitiveservices.azure.com/
+  keyVault: https://memealyzerdevkeyvault.vault.azure.net/
+  blob: https://memealyzerdevstorage.blob.core.windows.net/
+  queue: https://memealyzerdevstorage.queue.core.windows.net/
+  textAnalytics: https://memealyzerdevtextanalytics.cognitiveservices.azure.com/
+  table: https://memealyzerdevstorage.table.core.windows.net/
+  appConfig: https://memealyzerdevappconfig.azconfig.io
+  functions: http://localhost:3080
+
+registry: memealyzerdevacr.azurecr.io
+apiImage: memealyzernetapi:1.0.0
+queueServiceImage: memealyzernetqueueservice:1.0.0
+webImage: memealyzernetwebapp:1.0.0
+
+storage:
+  type: COSMOS_SQL
+  storageAccount: memealyzerdevstorage
